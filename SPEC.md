@@ -21,7 +21,7 @@ Status: **agreed spec, pre-implementation** (interview 2026-07-16).
 
 ## 2. Architecture
 
-Follows the micperms blueprint: headless controller + DOM renderer split, reactive state
+Follows the mediaperms blueprint: headless controller + DOM renderer split, reactive state
 via `@marianmeres/store`, logging via `@marianmeres/clog`, injectable adapters for
 everything that touches the platform.
 
@@ -33,9 +33,9 @@ exports:
 
 ### 2.1 Seams (injectable interfaces)
 
-**`CameraAdapter`** — mirrors micperms' `MicPermsBrowserAdapter`, adapted for video.
-Key difference vs micperms: the scanner RETAINS the acquired `MediaStream` for the live
-preview (micperms probes and stops tracks immediately). All tracks are stopped on
+**`CameraAdapter`** — mirrors mediaperms' `MediaPermsBrowserAdapter`, adapted for video.
+Key difference vs mediaperms: the scanner RETAINS the acquired `MediaStream` for the live
+preview (mediaperms probes and stops tracks immediately). All tracks are stopped on
 `stop()`/`destroy()`.
 
 ```ts
@@ -130,7 +130,7 @@ interface ScanResult {
 }
 ```
 
-Error codes (superset of micperms taxonomy, same semantics — methods never throw,
+Error codes (superset of mediaperms taxonomy, same semantics — methods never throw,
 errors land in `state.error`):
 `NO_DEVICE | INSECURE_CONTEXT | DEVICE_BUSY | PERMISSION_DENIED | REQUEST_FAILED | NOT_SUPPORTED | DETECTOR_FAILED`
 
@@ -149,7 +149,7 @@ consumers than overloading `REQUEST_FAILED`.)
   detection wins; all are available on the raw detector result.)
 - **Continuous**: every detection fires `onScan`, identical values suppressed for `dedupeMs`;
   runs until `stop()`/`destroy()`.
-- Multiple concurrent `start()` calls coalesce (micperms in-flight promise pattern).
+- Multiple concurrent `start()` calls coalesce (mediaperms in-flight promise pattern).
 - Every async resumption point (frame decode, stream acquisition, camera switch,
   torch apply) is generation-guarded — stale continuations from a stopped session
   never touch the session that replaced it (added after adversarial review,
@@ -189,7 +189,7 @@ consumers than overloading `REQUEST_FAILED`.)
 
 - [ ] `deno.json`: multi-entry `exports` map, `compilerOptions.lib: ["dom","dom.iterable","deno.ns"]`,
       `publish.exclude: [".claude/","tests/","example/","scripts/"]`, `build:example` task,
-      `fmt.proseWrap: "preserve"` — mirroring micperms.
+      `fmt.proseWrap: "preserve"` — mirroring mediaperms.
 - [ ] `scripts/build-npm.ts`: fill `dependencies` list + `entryPoints` for both entries.
 - [ ] Docs: `README.md` (badges, install, usage, semantics, API link), `AGENTS.md`, `API.md`,
       `CLAUDE.md` (pointer), `mcp-include.txt`.
@@ -198,7 +198,7 @@ consumers than overloading `REQUEST_FAILED`.)
       fixture-based decode tests (real wasm decode runs only in the browser example, not CI).
 - [ ] `example/`: vanilla demo page (camera stage + scan result display + torch/switch buttons),
       bundled via `jsr:@marianmeres/deno-build`; plus a sample Svelte wrapper component
-      (like micperms' `example/svelte/`).
+      (like mediaperms' `example/svelte/`).
 - [ ] `globalThis` (never `window`); `using`-friendly idempotent unsubscribes/destroy.
 
 ## 5. Explicitly out of scope (v1)

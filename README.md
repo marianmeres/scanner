@@ -228,7 +228,7 @@ const scanner = createScanner({ adapter: createDefaultCameraAdapter({ perms }) }
 
 The adapter seam is also how tests run without real browser APIs.
 
-Unlike `@marianmeres/micperms` (which probes permission and stops tracks immediately),
+Unlike `@marianmeres/mediaperms` (which probes permission and stops tracks immediately),
 the scanner RETAINS the acquired `MediaStream` for the live preview — all tracks are
 stopped on `stop()`/`destroy()`.
 

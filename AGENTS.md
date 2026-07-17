@@ -52,7 +52,7 @@ jsDelivr CDN by default; `wasmOverrides.locateFile` enables self-hosting (CSP).
 | **Detector**           | Injectable seam for the decode engine (W3C `BarcodeDetector`-shaped); default wraps the ponyfill. Mock in tests.                                                                                                                                      |
 | **Reactive state**     | `@marianmeres/store` powers `subscribe()` (Svelte `$store` compatible, fires immediately)                                                                                                                                                             |
 | **Never-throw**        | Scanner methods never throw/reject — errors land in `state.error` (`ScannerErrorCode`)                                                                                                                                                                |
-| **Stream retention**   | Unlike micperms (probe + stop), the scanner RETAINS the `MediaStream` for the live preview; tracks stop on `stop()`/`destroy()`                                                                                                                       |
+| **Stream retention**   | Unlike mediaperms (probe + stop), the scanner RETAINS the `MediaStream` for the live preview; tracks stop on `stop()`/`destroy()`                                                                                                                     |
 | **Headless/DOM split** | Core constructs no DOM (video element lazily, only when needed); all chrome lives in `stage.ts`                                                                                                                                                       |
 
 ## Public API
@@ -120,7 +120,7 @@ jsDelivr CDN by default; `wasmOverrides.locateFile` enables self-hosting (CSP).
 
 - [ ] Read `SPEC.md` for design decisions and out-of-scope items
 - [ ] Read `src/types.ts` first — all public contracts live there
-- [ ] Check existing patterns (micperms is the architectural blueprint)
+- [ ] Check existing patterns (mediaperms is the architectural blueprint)
 - [ ] Run `deno task test`
 - [ ] Run `deno fmt` and `deno check src/mod.ts src/stage.ts`
 
