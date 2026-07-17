@@ -1,0 +1,6 @@
+Framework-agnostic browser QR/barcode scanner primitive. Headless controller
+(createScanner) with reactive state via @marianmeres/store, single-shot and continuous
+modes, torch toggle, camera switching, still-image decoding (scanImage), and a
+mountable viewfinder stage UI at the /stage subpath. Decodes via the barcode-detector
+ponyfill (zxing-cpp wasm); camera acquisition is isolated behind an injectable
+CameraAdapter seam (default adapter delegates the permission lifecycle to @marianmeres/mediaperms).
