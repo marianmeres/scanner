@@ -219,6 +219,9 @@
 		.log-actions button:hover {
 			opacity: 0.7;
 		}
+		.log-actions button:disabled {
+			opacity: 0.15;
+		}
 		#log {
 			font-family: var(--mono);
 			font-size: 0.9rem;
@@ -239,6 +242,117 @@
 			flex-direction: column;
 			flex: 1;
 			min-height: 0;
+		}
+
+		/* --- history -------------------------------------------------- */
+		.history-wrap {
+			margin-top: 1rem;
+		}
+		#history {
+			list-style: none;
+			background: var(--card);
+			border: 1px solid var(--border);
+			border-radius: 0.5rem;
+			overflow: hidden;
+		}
+		#history li + li {
+			border-top: 1px solid var(--border);
+		}
+		#history button {
+			display: block;
+			width: 100%;
+			overflow: hidden;
+			text-align: left;
+			background: none;
+			color: inherit;
+			border-radius: 0;
+			padding: 0.5rem 0.75rem;
+		}
+		#history button:hover {
+			background: var(--bg);
+		}
+		.h-value {
+			display: block;
+			font-family: var(--mono);
+			font-size: 0.85rem;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+		.h-meta {
+			display: block;
+			font-size: 0.75rem;
+			opacity: 0.55;
+			margin-top: 0.15rem;
+		}
+		.history-empty {
+			padding: 0.75rem;
+			font-size: 0.85rem;
+			opacity: 0.5;
+		}
+
+		#history-dialog {
+			margin: auto;
+			width: min(440px, calc(100vw - 2rem));
+			max-height: calc(100dvh - 2rem);
+			background: var(--card);
+			color: var(--fg);
+			border: 1px solid var(--border);
+			border-radius: 0.75rem;
+		}
+		#history-dialog::backdrop {
+			background: rgb(0 0 0 / 0.5);
+		}
+		.hd-inner {
+			display: flex;
+			flex-direction: column;
+			gap: 0.75rem;
+			padding: 0.875rem;
+		}
+		.hd-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+		.hd-header h2 {
+			margin: 0;
+		}
+		.hd-header button {
+			background: none;
+			color: inherit;
+			padding: 0.25rem 0.5rem;
+			font-size: 1rem;
+		}
+		#hd-value {
+			font-family: var(--mono);
+			font-size: 0.9rem;
+			line-height: 1.5;
+			white-space: pre-wrap;
+			word-break: break-all;
+			background: var(--bg);
+			border: 1px solid var(--border);
+			border-radius: 0.5rem;
+			padding: 0.75rem;
+			max-height: 50dvh;
+			overflow: auto;
+		}
+		#hd-value a {
+			color: var(--btn);
+		}
+		.hd-meta {
+			display: grid;
+			grid-template-columns: auto 1fr;
+			gap: 0.25rem 0.75rem;
+			font-size: 0.85rem;
+		}
+		.hd-meta dt {
+			opacity: 0.55;
+		}
+		.hd-meta dd {
+			font-family: var(--mono);
+		}
+		.hd-inner .btn-row {
+			margin-bottom: 0;
 		}
 
 		footer {
@@ -339,6 +453,40 @@
 			<pre id="log"></pre>
 		</div>
 
+		<!-- History (last unique scans, persisted to localStorage) -->
+		<div class="history-wrap">
+			<div class="log-header">
+				<h2 style="margin: 0">
+					History (<span id="history-count">0</span>)
+				</h2>
+				<div class="log-actions">
+					<button id="btn-history-share">share</button>
+					<button id="btn-history-clear">clear</button>
+				</div>
+			</div>
+			<ol id="history"></ol>
+		</div>
+
+		<dialog id="history-dialog" aria-labelledby="hd-title">
+			<div class="hd-inner">
+				<div class="hd-header">
+					<h2 id="hd-title">Scan <span id="hd-pos"></span></h2>
+					<button id="hd-close" aria-label="Close">✕</button>
+				</div>
+				<div id="hd-value"></div>
+				<dl class="hd-meta">
+					<dt>Format</dt>
+					<dd id="hd-format"></dd>
+					<dt>Scanned</dt>
+					<dd id="hd-time"></dd>
+				</dl>
+				<div class="btn-row">
+					<button class="btn-secondary" id="hd-prev">‹ Previous</button>
+					<button class="btn-secondary" id="hd-next">Next ›</button>
+				</div>
+			</div>
+		</dialog>
+
 		<footer>
 			⚠️ Camera access requires a <b>secure context</b> — serve this page over
 			HTTPS or from <code>localhost</code>. The zxing decoder
@@ -383,6 +531,227 @@
 			logEl.textContent = "";
 			logCountEl.textContent = "0";
 		};
+
+		// ---------------------------------------------------------------------
+		// History (newest first, persisted to localStorage)
+		//
+		// Identity is `format|value` (same key the scanner uses for its own
+		// continuous-mode dedupe). Rescanning a known code does not add a
+		// duplicate - it moves the existing entry back to the top with a fresh
+		// timestamp (so frequently scanned codes are not evicted by the limit).
+		// ---------------------------------------------------------------------
+		const HISTORY_STORAGE_KEY = "@marianmeres/scanner/example/history";
+		const HISTORY_LIMIT = 50;
+
+		const hEls = {
+			list: document.getElementById("history"),
+			count: document.getElementById("history-count"),
+			share: document.getElementById("btn-history-share"),
+			clear: document.getElementById("btn-history-clear"),
+			dialog: document.getElementById("history-dialog"),
+			pos: document.getElementById("hd-pos"),
+			value: document.getElementById("hd-value"),
+			format: document.getElementById("hd-format"),
+			time: document.getElementById("hd-time"),
+			prev: document.getElementById("hd-prev"),
+			next: document.getElementById("hd-next"),
+			close: document.getElementById("hd-close"),
+		};
+
+		const historyKey = (entry) => `${entry.format}|${entry.value}`;
+		const formatTime = (ts) => new Date(ts).toLocaleString();
+
+		function loadHistory() {
+			try {
+				const data = JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY));
+				if (!Array.isArray(data)) return [];
+				return data
+					.filter((e) =>
+						typeof e?.value === "string" &&
+						typeof e?.format === "string" &&
+						typeof e?.timestamp === "number"
+					)
+					.slice(0, HISTORY_LIMIT);
+			} catch (e) {
+				log(`(History load failed: ${e.message})`);
+				return [];
+			}
+		}
+
+		function saveHistory() {
+			try {
+				localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(historyItems));
+			} catch (e) {
+				log(`(History save failed: ${e.message})`);
+			}
+		}
+
+		let historyItems = loadHistory();
+
+		function addToHistory(result) {
+			const entry = {
+				value: result.value,
+				format: result.format,
+				timestamp: result.timestamp || Date.now(),
+			};
+			const key = historyKey(entry);
+			historyItems = [
+				entry,
+				...historyItems.filter((e) => historyKey(e) !== key),
+			].slice(0, HISTORY_LIMIT);
+			saveHistory();
+			renderHistory();
+		}
+
+		function renderHistory() {
+			hEls.count.textContent = historyItems.length;
+			hEls.share.disabled = !historyItems.length;
+			hEls.clear.disabled = !historyItems.length;
+
+			if (!historyItems.length) {
+				const li = document.createElement("li");
+				li.className = "history-empty";
+				li.textContent = "(nothing scanned yet)";
+				hEls.list.replaceChildren(li);
+			} else {
+				hEls.list.replaceChildren(
+					...historyItems.map((entry) => {
+						const value = document.createElement("span");
+						value.className = "h-value";
+						value.textContent = entry.value;
+						const meta = document.createElement("span");
+						meta.className = "h-meta";
+						meta.textContent = `${entry.format} · ${formatTime(entry.timestamp)}`;
+						const btn = document.createElement("button");
+						btn.append(value, meta);
+						btn.onclick = () => openDetail(historyKey(entry));
+						const li = document.createElement("li");
+						li.append(btn);
+						return li;
+					}),
+				);
+			}
+
+			// keep an open detail in sync (entries may shift while scanning)
+			if (hEls.dialog.open) renderDetail();
+		}
+
+		// Scanned payloads are untrusted: split into text nodes + anchors, only
+		// http(s) URLs become links, and nothing goes through innerHTML.
+		const URL_RE = /\bhttps?:\/\/[^\s<>"']+/gi;
+
+		function linkify(text) {
+			const nodes = [];
+			let pos = 0;
+			for (const m of text.matchAll(URL_RE)) {
+				// don't swallow trailing punctuation ("see https://example.com.")
+				let url = m[0].replace(/[.,;:!?]+$/, "");
+				if (url.endsWith(")") && !url.includes("(")) url = url.slice(0, -1);
+				try {
+					new URL(url);
+				} catch {
+					continue;
+				}
+				nodes.push(document.createTextNode(text.slice(pos, m.index)));
+				const a = document.createElement("a");
+				a.href = url;
+				a.target = "_blank";
+				a.rel = "noopener noreferrer";
+				a.textContent = url;
+				nodes.push(a);
+				pos = m.index + url.length;
+			}
+			nodes.push(document.createTextNode(text.slice(pos)));
+			return nodes;
+		}
+
+		// the detail tracks its entry by key (not index), so prev/next stay
+		// correct when new scans are prepended while the dialog is open
+		let detailKey = null;
+
+		const detailIndex = () => historyItems.findIndex((e) => historyKey(e) === detailKey);
+
+		function openDetail(key) {
+			detailKey = key;
+			renderDetail();
+			if (!hEls.dialog.open) hEls.dialog.showModal();
+		}
+
+		function renderDetail() {
+			const idx = detailIndex();
+			if (idx === -1) return hEls.dialog.close();
+			const entry = historyItems[idx];
+			hEls.pos.textContent = `${idx + 1} / ${historyItems.length}`;
+			hEls.value.replaceChildren(...linkify(entry.value));
+			hEls.format.textContent = entry.format;
+			hEls.time.textContent = formatTime(entry.timestamp);
+			hEls.prev.disabled = idx === 0;
+			hEls.next.disabled = idx === historyItems.length - 1;
+		}
+
+		function stepDetail(delta) {
+			const entry = historyItems[detailIndex() + delta];
+			if (!entry) return;
+			detailKey = historyKey(entry);
+			renderDetail();
+		}
+
+		hEls.prev.onclick = () => stepDetail(-1);
+		hEls.next.onclick = () => stepDetail(1);
+		hEls.close.onclick = () => hEls.dialog.close();
+		hEls.dialog.addEventListener("close", () => (detailKey = null));
+		// backdrop click (the inner wrapper covers the whole dialog box)
+		hEls.dialog.addEventListener("click", (e) => {
+			if (e.target === hEls.dialog) hEls.dialog.close();
+		});
+		// on document, not the dialog: disabling the focused prev/next button
+		// at either end moves focus out of the dialog
+		document.addEventListener("keydown", (e) => {
+			if (!hEls.dialog.open) return;
+			if (e.key === "ArrowLeft") stepDetail(-1);
+			if (e.key === "ArrowRight") stepDetail(1);
+		});
+
+		hEls.share.onclick = async () => {
+			const text = JSON.stringify(
+				historyItems.map((e) => ({
+					value: e.value,
+					format: e.format,
+					scannedAt: new Date(e.timestamp).toISOString(),
+				})),
+				null,
+				2,
+			);
+			const data = { title: "Scan history", text };
+			if (navigator.share && (navigator.canShare?.(data) ?? true)) {
+				try {
+					await navigator.share(data);
+					log(`(History shared: ${historyItems.length} entries)`);
+					return;
+				} catch (e) {
+					if (e.name === "AbortError") return; // share sheet dismissed
+					log(`(Share failed: ${e.message} - trying clipboard)`);
+				}
+			} else {
+				log("(Web Share API not available - trying clipboard)");
+			}
+			try {
+				await navigator.clipboard.writeText(text);
+				log(`(History copied to clipboard: ${historyItems.length} entries)`);
+			} catch (e) {
+				log(`(Copy failed: ${e.message})`);
+			}
+		};
+
+		hEls.clear.onclick = () => {
+			if (!confirm(`Clear all ${historyItems.length} history entries?`)) return;
+			historyItems = [];
+			saveHistory();
+			renderHistory();
+			log("(History cleared)");
+		};
+
+		renderHistory();
 
 		// ---------------------------------------------------------------------
 		// Dom refs + settings
@@ -447,7 +816,10 @@
 			scanner = createScanner({
 				mode: s.mode,
 				formats: s.formats,
-				onScan: (r) => log(`onScan: [${r.format}] ${r.value}`),
+				onScan: (r) => {
+					log(`onScan: [${r.format}] ${r.value}`);
+					addToHistory(r);
+				},
 				onError: (e) => log(`onError: [${e.code}] ${e.message}`),
 			});
 			unsub = scanner.subscribe(renderState);
@@ -556,6 +928,8 @@
 						.map((r, i) => `[${i}] (${r.format}) ${r.value}`)
 						.join("\n");
 					results.forEach((r) => log(`scanImage result: [${r.format}] ${r.value}`));
+					// reversed, so the first result ends up on top
+					[...results].reverse().forEach((r) => addToHistory(r));
 				}
 			} catch (e) {
 				els.imgResults.textContent = `Error: ${e.message}`;

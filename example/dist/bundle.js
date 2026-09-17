@@ -639,7 +639,7 @@ function createStore(initial, options = null) {
   return { set, get, update, subscribe };
 }
 
-// https://jsr.io/@marianmeres/mediaperms/1.1.1/src/mediaperms.ts
+// https://jsr.io/@marianmeres/mediaperms/1.2.0/src/mediaperms.ts
 var MediaPermsErrorCode = {
   CheckFailed: "CHECK_FAILED",
   RequestFailed: "REQUEST_FAILED",
@@ -1142,7 +1142,7 @@ function createDefaultCameraAdapter(options = {}) {
   };
 }
 
-// ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/barcode-detector@3.2.1_@types+emscripten@1.41.5/node_modules/barcode-detector/dist/es/zxing-exported.js
+// ../../../Library/Caches/deno/deno_esbuild/registry.npmjs.org/barcode-detector@3.2.2_@types+emscripten@1.41.6/node_modules/barcode-detector/dist/es/zxing-exported.js
 var e = [
   [
     "All",
@@ -1669,7 +1669,7 @@ var _ = {
 };
 var ne = { locateFile: (e2, t2) => {
   let n2 = e2.match(/_(.+?)\.wasm$/);
-  return n2 ? `https://fastly.jsdelivr.net/npm/zxing-wasm@3.1.1/dist/${n2[1]}/${e2}` : t2 + e2;
+  return n2 ? `https://fastly.jsdelivr.net/npm/zxing-wasm@3.1.3/dist/${n2[1]}/${e2}` : t2 + e2;
 } };
 var v = /* @__PURE__ */ new WeakMap();
 function re(e2, t2) {
@@ -1726,7 +1726,7 @@ async function oe(e2, t2, n2 = m) {
 ({ ...m }, [...m.formats]), { ..._ };
 async function se(e2 = {}) {
   var t2, n2, r2, i2 = e2, a2 = !!globalThis.window, o2 = typeof Bun < "u", s2 = !!globalThis.WorkerGlobalScope;
-  !((n2 = globalThis.process) == null || (n2 = n2.versions) == null) && n2.node && ((r2 = globalThis.process) == null || r2.type);
+  (n2 = globalThis.process) != null && (n2 = n2.versions) != null && n2.node && ((r2 = globalThis.process) == null || r2.type);
   var c2 = "./this.program", l2, u2 = "";
   function d2(e3) {
     return i2.locateFile ? i2.locateFile(e3, u2) : u2 + e3;
@@ -1757,7 +1757,7 @@ async function se(e2 = {}) {
     he2(ve2);
   }
   function re2() {
-    te2 = true, Mr.ya();
+    te2 = true, Nr.za();
   }
   function ie2() {
     if (i2.postRun) for (typeof i2.postRun == "function" && (i2.postRun = [i2.postRun]); i2.postRun.length; ) _e2(i2.postRun.shift());
@@ -1808,7 +1808,7 @@ async function se(e2 = {}) {
   }
   async function fe2() {
     function e3(e4, t4) {
-      return Mr = e4.exports, Gn(Mr), ne2(), Mr;
+      return Nr = e4.exports, Gn(Nr), ne2(), Nr;
     }
     function t3(t4) {
       return e3(t4.instance);
@@ -2442,7 +2442,8 @@ async function se(e2 = {}) {
       };
     };
     e3[Symbol.iterator] || (e3[Symbol.iterator] = function() {
-      return r3(this[t3](), (e4) => this[n3](e4));
+      let e4 = this[t3]();
+      return r3(e4, (e5) => this[n3](e5));
     });
   }, Bt = (e3, t3, n3, r3) => {
     n3 = B(n3), r3 = B(r3), z([], [e3, t3], (e4) => {
@@ -2543,12 +2544,13 @@ async function se(e2 = {}) {
         var r3, i3 = typeof t4 == "string";
         i3 || ArrayBuffer.isView(t4) && t4.BYTES_PER_ELEMENT == 1 || H("Cannot pass non-string to std::string"), r3 = n3 && i3 ? Gt(t4) : t4.length;
         var a3 = Mn(4 + r3 + 1), o3 = a3 + 4;
-        if (w2[a3 >> 2] = r3, i3) if (n3) X(t4, o3, r3 + 1);
-        else for (var s3 = 0; s3 < r3; ++s3) {
-          var c3 = t4.charCodeAt(s3);
-          c3 > 255 && (Q(a3), H("String has UTF-16 code units that do not fit in 8 bits")), T2[o3 + s3] = c3;
-        }
-        else T2.set(t4, o3);
+        if (w2[a3 >> 2] = r3, i3) {
+          if (n3) X(t4, o3, r3 + 1);
+          else for (var s3 = 0; s3 < r3; ++s3) {
+            var c3 = t4.charCodeAt(s3);
+            c3 > 255 && (Q(a3), H("String has UTF-16 code units that do not fit in 8 bits")), T2[o3 + s3] = c3;
+          }
+        } else T2.set(t4, o3);
         return e4 !== null && e4.push(Q, a3), a3;
       },
       readValueFromPointer: F2,
@@ -2666,7 +2668,6 @@ async function se(e2 = {}) {
           break;
         case 1:
           d3 = Y.toValue(t4)[hn(r4)](...s3);
-          break;
       }
       return pn(a3, i4, d3);
     }));
@@ -2732,7 +2733,7 @@ async function se(e2 = {}) {
   if (Ke(), pt(), i2.noExitRuntime && i2.noExitRuntime, i2.print && i2.print, i2.printErr && (m2 = i2.printErr), i2.wasmBinary && (h2 = i2.wasmBinary), i2.arguments && i2.arguments, i2.thisProgram && (c2 = i2.thisProgram), i2.preInit) for (typeof i2.preInit == "function" && (i2.preInit = [i2.preInit]); i2.preInit.length > 0; ) i2.preInit.shift()();
   var jn, Q, Mn, Nn, $, Pn, Fn, In, Ln, Rn, zn, Bn, Vn, Hn, Un, Wn;
   function Gn(e3) {
-    jn = e3.za, Q = i2._free = e3.Aa, Mn = i2._malloc = e3.Ca, Nn = e3.Da, $ = e3.Ea, Pn = e3.Fa, Fn = e3.Ga, In = e3.Ha, Ln = e3.Ia, Rn = e3.Ja, zn = e3.Ka, G.viijii = e3.La, Bn = G.viijjijjjjjj = e3.Ma, Vn = G.iiijj = e3.Na, Hn = G.jiiii = e3.Oa, G.iiiiij = e3.Pa, G.iiiiijj = e3.Qa, G.iiiiiijj = e3.Ra, Un = e3.xa, Wn = e3.Ba;
+    jn = e3.Aa, Q = i2._free = e3.Ba, Mn = i2._malloc = e3.Da, Nn = e3.Ea, $ = e3.Fa, Pn = e3.Ga, Fn = e3.Ha, In = e3.Ia, Ln = e3.Ja, Rn = e3.Ka, zn = e3.La, G.viijii = e3.Ma, Bn = G.viijjijjjjjj = e3.Na, Vn = G.iiijj = e3.Oa, Hn = G.jiiii = e3.Pa, G.iiiiij = e3.Qa, G.iiiiijj = e3.Ra, G.iiiiiijj = e3.Sa, Un = e3.ya, Wn = e3.Ca;
   }
   var Kn = {
     q: be2,
@@ -2745,43 +2746,43 @@ async function se(e2 = {}) {
     fa: Oe2,
     d: ke2,
     ba: Ae2,
-    ua: Ne,
+    va: Ne,
     aa: Pe,
-    oa: Ie,
-    sa: Ct,
-    ra: Dt,
+    pa: Ie,
+    ta: Ct,
+    sa: Dt,
     H: kt,
-    ma: Nt,
+    na: Nt,
     X: Ft,
     Y: It,
     A: Rt,
-    qa: Bt,
+    ra: Bt,
     u: Vt,
-    ta: Ut,
-    na: Xt,
+    ua: Ut,
+    oa: Xt,
     T: an,
     I: on,
-    va: sn,
-    pa: cn,
+    wa: sn,
+    qa: cn,
     O: gn,
-    wa: jt,
+    xa: jt,
     F: _n,
     U: vn,
     N: yn,
-    ha: bn,
+    ia: bn,
     ca: xn,
     ga: Tn,
     da: On,
     ea: kn,
-    ka: pr,
+    la: pr,
     M: gr,
     B: Sr,
     P: er,
-    V: wr,
-    s: Tr,
+    V: Tr,
+    s: Er,
     b: Yn,
     C: hr,
-    ia: br,
+    ja: br,
     c: Zn,
     Q: xr,
     h: $n,
@@ -2791,26 +2792,27 @@ async function se(e2 = {}) {
     t: lr,
     G: ur,
     D: dr,
-    K: Er,
-    _: kr,
-    Z: Ar,
+    K: Dr,
+    _: Ar,
+    Z: jr,
     f: tr,
     l: qn,
+    ha: Cr,
     e: Xn,
     W: _r,
     g: Qn,
-    L: Cr,
+    L: wr,
     k: Jn,
-    ja: vr,
+    ka: vr,
     o: cr,
     y: rr,
     v: fr,
     E: ar,
     w: yr,
     n: nr,
-    J: Dr,
-    la: ir,
-    $: Or,
+    J: Or,
+    ma: ir,
+    $: kr,
     z: An
   };
   function qn(e3, t3) {
@@ -3083,7 +3085,16 @@ async function se(e2 = {}) {
       $(1, 0);
     }
   }
-  function Cr(e3, t3, n3, r3, i3, a3, o3) {
+  function Cr(e3, t3, n3) {
+    var r3 = D2();
+    try {
+      K(e3)(t3, n3);
+    } catch (e4) {
+      if (E2(r3), e4 !== e4 + 0) throw e4;
+      $(1, 0);
+    }
+  }
+  function wr(e3, t3, n3, r3, i3, a3, o3) {
     var s3 = D2();
     try {
       K(e3)(t3, n3, r3, i3, a3, o3);
@@ -3092,7 +3103,7 @@ async function se(e2 = {}) {
       $(1, 0);
     }
   }
-  function wr(e3, t3, n3, r3) {
+  function Tr(e3, t3, n3, r3) {
     var i3 = D2();
     try {
       return K(e3)(t3, n3, r3);
@@ -3101,7 +3112,7 @@ async function se(e2 = {}) {
       $(1, 0);
     }
   }
-  function Tr(e3) {
+  function Er(e3) {
     var t3 = D2();
     try {
       return K(e3)();
@@ -3110,7 +3121,7 @@ async function se(e2 = {}) {
       $(1, 0);
     }
   }
-  function Er(e3, t3, n3, r3, i3, a3, o3, s3, c3, l3, u3, d3) {
+  function Dr(e3, t3, n3, r3, i3, a3, o3, s3, c3, l3, u3, d3) {
     var f3 = D2();
     try {
       return K(e3)(t3, n3, r3, i3, a3, o3, s3, c3, l3, u3, d3);
@@ -3119,7 +3130,7 @@ async function se(e2 = {}) {
       $(1, 0);
     }
   }
-  function Dr(e3, t3, n3, r3, i3, a3, o3, s3, c3, l3, u3, d3, f3, p3, m3, h3) {
+  function Or(e3, t3, n3, r3, i3, a3, o3, s3, c3, l3, u3, d3, f3, p3, m3, h3) {
     var g3 = D2();
     try {
       K(e3)(t3, n3, r3, i3, a3, o3, s3, c3, l3, u3, d3, f3, p3, m3, h3);
@@ -3128,7 +3139,7 @@ async function se(e2 = {}) {
       $(1, 0);
     }
   }
-  function Or(e3, t3, n3, r3, i3, a3, o3, s3, c3, l3, u3, d3, f3, p3, m3, h3, g3, _3, ee3, te3) {
+  function kr(e3, t3, n3, r3, i3, a3, o3, s3, c3, l3, u3, d3, f3, p3, m3, h3, g3, _3, ee3, te3) {
     var ne3 = D2();
     try {
       Bn(e3, t3, n3, r3, i3, a3, o3, s3, c3, l3, u3, d3, f3, p3, m3, h3, g3, _3, ee3, te3);
@@ -3137,7 +3148,7 @@ async function se(e2 = {}) {
       $(1, 0);
     }
   }
-  function kr(e3, t3, n3, r3, i3, a3, o3) {
+  function Ar(e3, t3, n3, r3, i3, a3, o3) {
     var s3 = D2();
     try {
       return Vn(e3, t3, n3, r3, i3, a3, o3);
@@ -3146,7 +3157,7 @@ async function se(e2 = {}) {
       $(1, 0);
     }
   }
-  function Ar(e3, t3, n3, r3, i3) {
+  function jr(e3, t3, n3, r3, i3) {
     var a3 = D2();
     try {
       return Hn(e3, t3, n3, r3, i3);
@@ -3155,7 +3166,7 @@ async function se(e2 = {}) {
       $(1, 0);
     }
   }
-  function jr() {
+  function Mr() {
     v2();
     function e3() {
       var e4, t3;
@@ -3165,8 +3176,8 @@ async function se(e2 = {}) {
       setTimeout(() => i2.setStatus(""), 1), e3();
     }, 1)) : e3();
   }
-  var Mr = await fe2();
-  return jr(), t2 = te2 ? i2 : new Promise((e3, t3) => {
+  var Nr = await fe2();
+  return Mr(), t2 = te2 ? i2 : new Promise((e3, t3) => {
     _2 = e3, ee2 = t3;
   }), t2;
 }

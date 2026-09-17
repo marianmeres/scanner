@@ -4,6 +4,14 @@ Self-contained vanilla-JS demo of `@marianmeres/scanner` — live camera stage
 (single/continuous mode, torch, camera switch) plus `scanImage` decode from an
 uploaded image file.
 
+Both camera and image-file scans land in a **History** list (below the log):
+the last 50 unique codes (identity `format|value` — a rescan moves the existing
+entry back to the top instead of duplicating it), newest first, persisted to
+`localStorage`. Clicking an entry opens a details dialog with previous/next
+navigation (buttons or ←/→ keys) where `http(s)` URLs are rendered as links
+opening in a new tab. "share" sends the history as pretty-printed JSON via the
+Web Share API, falling back to the clipboard where that API is unavailable.
+
 ## Build
 
 Bundles `src/mod.ts` → `dist/bundle.js` and `src/stage.ts` → `dist/stage.js`
